@@ -1,0 +1,46 @@
+#include <iostream>
+#include <bits/stdc++.h>
+
+ 
+void is_digits(std::string& str)
+{
+    for (char ch : str) {
+        if (!isdigit(ch)){
+              std::cout << "False" << std::endl;
+            return;
+        }
+    }
+ 
+    std::cout << "True" << std::endl;
+}
+
+
+int digital_root(int n) {
+    while (n >= 10) {
+        int sum = 0;
+        while (n > 0) {
+            sum += n % 10; // Добавляем последнюю цифру к сумме
+            n /= 10;       // Убираем последнюю цифру
+        }
+        n = sum;          // Обновляем n с суммой цифр
+    }
+    return n;            // Возвращаем цифровой корень
+}
+
+int main() {
+    int number;
+    std::cout << "Введите число: ";
+    std::cin >> number;
+    if (number == 1) // Проверка на единмчку
+       return 0;
+    if (number < 0) // Проверка на знак
+        return 0;
+    std::string proverka;
+    proverka = std::to_string(number);
+    is_digits(proverka); // Проверка на то, что мы получили вообще число
+        
+    int result = digital_root(number);
+    std::cout<< "Цифровой корень числа "<< number <<" равен " << result << std::endl;
+
+    return 0;
+}
