@@ -9,7 +9,7 @@
 #include <bits/stdc++.h>
 
 
-void is_digits(std::string& str)
+void is_digits(std::string& str) // Функция для проверки на то, что пользователь вводит цифры, а не символы
 {
     for (char ch : str) {
         if (!isdigit(ch)) {
