@@ -47,7 +47,7 @@ int main() {
     is_digits(proverka); // Проверка на то, что мы получили вообще число
 
     int result = digital_root(number);
-    std::cout << "Digital root of the num " << number << " is " << result << std::endl;
+    std::cout << "Digital root of the number " << number << " is " << result << std::endl;
 
     return 0;
 }
