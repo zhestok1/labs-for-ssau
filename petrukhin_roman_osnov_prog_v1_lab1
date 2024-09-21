@@ -1,0 +1,46 @@
+//Вариант-1
+
+// Расчет периметра многоугольника.
+// Входные данные: число сторон и длины сторон. 
+// Выходные данные: периметр и среднее значение стороны.
+
+// Петрухин Роман, 6103-010302D, 2 подгруппа.
+
+
+#include <iostream>
+
+using namespace std;
+
+int main() {
+    cout << "Hello World!" << endl;
+    int kolvo_sides;
+    double perimetr = 0;
+    cout << "Enter number of sides:";
+    while (true) {
+        cin >> kolvo_sides;
+        if (cin.fail() || kolvo_sides <= 0) {
+            cin.clear(); //Сброс ошибки
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Удаление некорректного ввода из входного потока
+            cout << "Error. Please enter number again: ";
+        }
+        else {
+            break;
+        }
+    }
+    
+    
+
+    for (int i = 0; i < kolvo_sides; ++i) {
+        double side;
+        cout << "Enter side length" << (i + 1) << ":";
+        cin >> side;
+        perimetr += side;
+    }
+
+    double sr_znach = perimetr / kolvo_sides;
+    cout << "Perimetr:" << perimetr << endl;
+    cout << "Average value:" << sr_znach;
+    
+
+    return 0;
+}
