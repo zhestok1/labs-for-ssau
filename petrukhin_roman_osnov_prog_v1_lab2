@@ -1,0 +1,81 @@
+#include <iostream>
+#include <cmath>
+#include <limits>
+// Сделал ограничения на factorial и n, потому что получаю бесконенчости при больших значениях...
+using namespace std;
+
+// Функция для вычисления факториала
+unsigned long long factorial(int n) {
+    if (n < 0) {
+        throw invalid_argument("The factorial is not defined for negative numbers.");
+    }
+    unsigned long long result = 1;
+    for (int i = 2; i <= n; ++i) {
+        result *= i;
+        // Проверка на переполнение
+        if (result == 0) {
+            throw overflow_error("Factorial computation resulted in overflow."); // В случае переполнения long сделает исключение
+        }
+    }
+    return result;
+}
+
+int main() {
+    double x, a; // x - параметр; a - точность вычислений
+    cout << "Enter the parameter x: ";
+
+    // Цикл для ввода x
+    while (true) {
+        cin >> x;
+        if (cin.fail() || x < 0) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Invalid input. Please enter a positive number for x: ";
+        }
+        else {
+            break;
+        }
+    }
+
+    cout << "Enter the parameter a (accuracy): ";
+
+    // Цикл для ввода a
+    while (true) {
+        cin >> a;
+        if (cin.fail() || a < 0) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Invalid input. Please enter a non-negative number for a: ";
+        }
+        else {
+            break;
+        }
+    }
+
+    double a_n, s_n = 0.0; // n-ый член, сумма членов ряда
+    const int MAX_N = 20; // Предел для n, борюсь с бесконечностями
+
+    for (int n = 1; n <= MAX_N; n++) {
+        unsigned long long fact = factorial(2 * n + 1);
+        // Проверка на переполнение при вычислении a_n
+        if (fact == 0) {
+            cout << "Factorial computation for n = " << n << " resulted in overflow." << endl;
+            break;
+        }
+
+        a_n = (pow(-1, n) * 2 * n * pow(x, 2 * n + 1)) / fact;
+        s_n += a_n; 
+
+        // Вывод текущего члена и суммы, которая ему соответствует
+        cout << "Sequence member a_" << n << ": " << a_n << ", Sum: " << s_n << endl;
+
+        
+        if (fabs(a_n) <= a) { // fabs - модуль числа из cmath
+            break; 
+        }
+    }
+
+    cout << "Final sum of the series: " << s_n << endl; 
+
+    return 0;
+}
