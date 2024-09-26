@@ -1,0 +1,31 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int main()
+{
+    setlocale(LC_ALL, "RU");
+    int n; // Колво элементов массива.
+    double k; // Само число, которое ищем
+    int count = 0; // Счётчик
+    cout << "Введите число (k): ";
+    cin >> k;
+    cout << "Введите размер массива (n): ";
+    cin >> n;
+
+    vector<double> massive(n);
+
+    cout << "Введите элементы массива:\n";
+    for (int i = 0; i < n; ++i) { 
+        cin >> massive[i]; // Пользователь заполняет массив
+    }
+
+    
+    for (double number : massive) {
+        if (number == k)
+            count += 1; // При нахождении k +1 к счетчику.
+    }
+
+    cout << "Количество вхождений числа " << k << " в массив: " << count << endl;
+    return 0;
+}
