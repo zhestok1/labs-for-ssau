@@ -34,7 +34,7 @@ int main() {
             cout << "Invalid input. Please enter a positive number for x: ";
         }
         else {
-            validInputX = true; // Корректный ввод для x
+            validInputX = true;
         }
     }
 
@@ -50,7 +50,7 @@ int main() {
             cout << "Invalid input. Please enter a non-negative number for a: ";
         }
         else {
-            validInputA = true; // Корректный ввод для a
+            validInputA = true; 
         }
     }
 
