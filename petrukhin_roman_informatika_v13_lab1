@@ -3,51 +3,59 @@
 числа суммой его цифр. Программа должна вычислять цифровой
 корень заданного целого неотрицательного числа.*/
 
-
-
 #include <iostream>
-#include <bits/stdc++.h>
-
-
-void is_digits(std::string& str) // Функция для проверки на то, что пользователь вводит цифры, а не символы
-{
-    for (char ch : str) {
-        if (!isdigit(ch)) {
-            std::cout << "False" << std::endl;
-            return;
-        }
-    }
-
-    std::cout << "True" << std::endl;
-}
-
+#include <limits>
+using namespace std;
 
 int digital_root(int n) {
     while (n >= 10) {
         int sum = 0;
         while (n > 0) {
             sum += n % 10; // Добавляем последнюю цифру к сумме
-            n /= 10;       // Убираем последнюю цифру
+            n /= 10;        // Убираем последнюю цифру
         }
-        n = sum;          // Обновляем n с суммой цифр
+        n = sum;           // Обновляем n с суммой цифр
     }
-    return n;            // Возвращаем цифровой корень
+    return n;           // Возвращаем цифровой корень
 }
 
 int main() {
-    int number;
-    std::cout << "Enter your number: ";
-    std::cin >> number;
-    if (number == 1) // Проверка на единмчку
-        return 0;
-    if (number < 0) // Проверка на знак
-        return 0;
-    std::string proverka;
-    proverka = std::to_string(number);
-    is_digits(proverka); // Проверка на то, что мы получили вообще число
+    bool running = true; // Флаг для управления главными циклами
 
-    int result = digital_root(number);
-    std::cout << "Digital root of the number " << number << " is " << result << std::endl;
+    while (running) { // Бесконечный цикл
+        int number;
+        bool validInput = false; // Флаг для проверки корректности ввода
 
-    return 0;
+        // Цикл для ввода числа
+        while (!validInput) {
+            cout << "Enter your number: ";
+            cin >> number;
+
+            // Проверка на ввод
+            if (cin.fail() || number < 0) {
+                cin.clear(); // Сброс флага ошибки
+                cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Очистка входного буфера
+                cout << "Invalid input. Please enter a positive integer." << endl; 
+            }
+            else {
+                validInput = true; // Установка флага при корректном вводе
+            }
+        }
+
+        int result = digital_root(number); 
+        cout << "The digital root of " << number << " is " << result << "." << endl; 
+
+        // Запрос на продолжение
+        char choice;
+        cout << "Do you want to continue? (y/n): ";
+        cin >> choice;
+
+        // Проверка на продолжение
+        if (choice != 'y' && choice != 'Y') {
+            running = false; // Устанавливаем флаг завершения главного цикла
+        }
+    }
+
+    cout << "Exiting the program." << endl; 
+    return 0; 
 }
