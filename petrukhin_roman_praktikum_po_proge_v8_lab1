@@ -33,13 +33,14 @@ int main() {
         // Освобождаем выделенную память
         delete[] massive;
 
-        // Спрашиваем, хочет ли пользователь продолжить
+        
         char choice;
         cout << "Хотите продолжить? (y/n): ";
         cin >> choice;
 
         if (choice == 'n' || choice == 'N') {
-            infinity_circle = false; // Выход из бесконечного цикла, если пользователь вводит 'n' или 'N'
+            cout << "Выполнение программы завершено!";
+            infinity_circle = false; 
         }
     }
 
