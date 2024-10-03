@@ -1,31 +1,47 @@
 #include <iostream>
-#include <vector>
 using namespace std;
 
-int main()
-{
+int main() {
     setlocale(LC_ALL, "RU");
-    int n; // Колво элементов массива.
-    double k; // Само число, которое ищем
-    int count = 0; // Счётчик
-    cout << "Введите число (k): ";
-    cin >> k;
-    cout << "Введите размер массива (n): ";
-    cin >> n;
 
-    vector<double> massive(n);
+    bool infinity_circle = true;
+    while (infinity_circle) { 
+        int n; // Кол-во элементов массива
+        double k; // Число, которое ищем
+        int count = 0; // Счётчик
 
-    cout << "Введите элементы массива:\n";
-    for (int i = 0; i < n; ++i) { 
-        cin >> massive[i]; // Пользователь заполняет массив
+        cout << "Введите число (k): ";
+        cin >> k;
+        cout << "Введите размер массива (n): ";
+        cin >> n;
+
+        // Выделяем память для динамического массива
+        double* massive = new double[n];
+        cout << "Введите элементы массива:\n";
+        for (int i = 0; i < n; ++i) {
+            cin >> massive[i]; // Пользователь заполняет массив
+        }
+
+        for (int i = 0; i < n; ++i) {
+            if (massive[i] == k) {
+                count += 1; // При нахождении k +1 к счётчику
+            }
+        }
+
+        cout << "Количество вхождений числа " << k << " в массив: " << count << endl;
+
+        // Освобождаем выделенную память
+        delete[] massive;
+
+        // Спрашиваем, хочет ли пользователь продолжить
+        char choice;
+        cout << "Хотите продолжить? (y/n): ";
+        cin >> choice;
+
+        if (choice == 'n' || choice == 'N') {
+            infinity_circle = false; // Выход из бесконечного цикла, если пользователь вводит 'n' или 'N'
+        }
     }
 
-    
-    for (double number : massive) {
-        if (number == k)
-            count += 1; // При нахождении k +1 к счетчику.
-    }
-
-    cout << "Количество вхождений числа " << k << " в массив: " << count << endl;
     return 0;
 }
