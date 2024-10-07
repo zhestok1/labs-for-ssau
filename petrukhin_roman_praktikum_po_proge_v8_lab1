@@ -1,4 +1,5 @@
 #include <iostream>
+#include <limits> 
 using namespace std;
 
 int main() {
@@ -10,33 +11,78 @@ int main() {
         double k; // Число, которое ищем
         int count = 0; // Счётчик
 
-        cout << "Введите число (k): ";
-        cin >> k;
+        // Проверка на ввод символа k
+        cout << "Введите символ (k): ";
+        bool validInputK = false;
+        while (!validInputK) {
+            cin >> k;
+            if (!cin.fail()) {
+                validInputK = true; // Ввод корректен
+            } else {
+                cout << "Ошибка ввода. Пожалуйста, введите число: ";
+                cin.clear(); 
+                cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
+            }
+        }
+
+        // Проверка на ввод размера массива n
         cout << "Введите размер массива (n): ";
-        cin >> n;
+        bool validInputN = false;
+        while (!validInputN) {
+            cin >> n;
+            if (cin.fail() || n <= 0) { // Проверка на положительное значение
+                cout << "Ошибка ввода. Пожалуйста, введите положительное целое число: ";
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            } else {
+                validInputN = true; // Ввод корректен
+            }
+        }
 
         // Выделяем память для динамического массива
         double* massive = new double[n];
         cout << "Введите элементы массива:\n";
         for (int i = 0; i < n; ++i) {
-            cin >> massive[i]; // Пользователь заполняет массив
+            bool validInputElement = false;
+            while (!validInputElement) {
+                cout << "Элемент " << (i + 1) << ": ";
+                cin >> massive[i]; // Пользователь заполняет массив
+                if (!cin.fail()) {
+                    validInputElement = true; // Ввод корректен
+                } else {
+                    cout << "Ошибка ввода. Пожалуйста, введите число: ";
+                    cin.clear(); 
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
+                }
+            }
         }
 
+        // Подсчет вхождений символа k
         for (int i = 0; i < n; ++i) {
             if (massive[i] == k) {
                 count += 1; // При нахождении k +1 к счётчику
             }
         }
 
-        cout << "Количество вхождений числа " << k << " в массив: " << count << endl;
+        cout << "Количество вхождений числа '" << k << "' в массив: " << count << endl;
 
         // Освобождаем выделенную память
         delete[] massive;
 
-        
         char choice;
         cout << "Хотите продолжить? (y/n): ";
         cin >> choice;
+
+        // Проверка ввода для продолжения
+        bool validChoice = false;
+        while (!validChoice) {
+            if (choice == 'y' || choice == 'Y' || choice == 'n' || choice == 'N') {
+                validChoice = true; 
+            } else {
+                cout << "Ошибка ввода. Пожалуйста, введите 'y' для продолжения или 'n' для выхода: ";
+                cin >> choice;
+            }
+        }
 
         if (choice == 'n' || choice == 'N') {
             cout << "Выполнение программы завершено!";
