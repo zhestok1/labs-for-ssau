@@ -40,6 +40,7 @@ void heap_sort(vector<int>& arr) {
 }
 
 int main() {
+    setlocale(LC_ALL, "RU");
     bool flag = true;
 
     while (flag) {
@@ -66,7 +67,7 @@ int main() {
         heap_sort(elements);
 
         cout << "Отсортированные элементы: ";
-        for (const auto& elem : elements) {
+        for ( auto elem : elements) {
             cout << elem << " ";
         }
         cout << endl;
