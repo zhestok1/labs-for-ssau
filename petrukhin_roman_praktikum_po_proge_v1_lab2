@@ -1,13 +1,14 @@
 #include <iostream>
 #include <cmath>
 #include <iomanip>
-#include <map>
+#include <vector>
 
 using namespace std;
 
 double factorial(int n) {
     if (n == 0 || n == 1)
         return 1;
+    
     double result = 1;
     for (int i = 2; i <= n; ++i) {
         result *= i;
@@ -16,44 +17,53 @@ double factorial(int n) {
 }
 
 int main() {
-    double An, x, alpha_n, accuracy; // инициализируем переменные
+    double An, x, alpha_n, accuracy;
     double prev_x = 0, prev_alpha = 0, Sn = 0;
     char answer;
     int last_iteration = 0;
 
-    
-    map<pair<double, int>, double> data;
+    // Вектор для хранения значений An
+    vector<double> An_values;
 
     do {
-        cout << "Enter x:\n"; // просим ввести значение x
-        cin >> x; // убраны ограничения на x
+        cout << "Enter x (any real number):\n";
+        while (!(cin >> x)) { // Проверка, что ввод корректный
+            cout << "Invalid input. Please enter a valid real number for x:\n";
+            cin.clear(); // Очистка флага ошибки
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Игнорирование неверного ввода
+        }
 
-        // Запрос альфа
-        cout << "Enter the alpha: \n"; 
-        cin >> alpha_n;
-        while (alpha_n <= 0) { // проверка на отрицательное число
-            cout << "The alpha must be a positive number. Try again!\n";
-            cout << "Enter the alpha: \n";
+        cout << "Enter the alpha (positive number):\n"; 
+        while (true) {
             cin >> alpha_n;
+            if (cin.fail() || alpha_n <= 0) { // Проверка на корректный ввод и положительное значение
+                cin.clear(); // Очистка флага ошибки
+                cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Игнорирование неверного ввода
+                cout << "The alpha must be a positive number. Try again:\n";
+            } else {
+                break; // Ввод корректен, выходим из цикла
+            }
         }
 
         if (x != prev_x || alpha_n != prev_alpha) {
             Sn = 0;
-            last_iteration = 0; // сбрасываем значения
+            last_iteration = 0;
+            An_values.clear(); // Очищаем вектор для новых вычислений
         }
 
         int i = last_iteration;
 
         do {
             cout << endl;
-            // проверяем мемоизацию
-            if (data.find(make_pair(x, i)) != data.end()) {
+
+            // Если значение An уже вычислено, берем его из вектора
+            if (i < An_values.size()) {
                 cout << "Iteration number (-n): " << i << endl;
-                An = data[make_pair(x, i)];
-            } else {
+                An = An_values[i];
+            } else { // В противном случае вычисляем новое значение
                 cout << "Iteration number (+n): " << i << endl;
                 An = (pow(-1, i) * 2 * i * pow(x, 2 * i + 1)) / factorial(2 * i + 1);
-                data[make_pair(x, i)] = An;
+                An_values.push_back(An); // Сохраняем новое значение в вектор
             }
 
             Sn += An;
@@ -64,15 +74,15 @@ int main() {
             cout << "Calculation accuracy (alpha): " << accuracy << endl;
 
             i += 1;
-        } while (abs(accuracy) >= alpha_n); // продолжаем пока точность больше alpha
+        } while (abs(accuracy) >= alpha_n);
 
         prev_x = x;
         prev_alpha = alpha_n;
         last_iteration = i; // обновляем значение последней итерации
 
-        cout << "Would you like to continue? If yes - enter Y, if no - any symbol.\n"; // запрос на продолжение программы
+        cout << "Would you like to continue? If yes - enter Y, if no - any symbol:\n";
         cin >> answer;
-    } while (answer == 'Y');
+    } while (answer == 'Y' || answer == 'y'); // Поддержка 'y' в нижнем регистре
 
     return 0;
 }
