@@ -2,13 +2,14 @@
 #include <cmath>
 #include <iomanip>
 #include <vector>
+#include <limits>
 
 using namespace std;
 
 double factorial(int n) {
     if (n == 0 || n == 1)
         return 1;
-    
+
     double result = 1;
     for (int i = 2; i <= n; ++i) {
         result *= i;
@@ -27,21 +28,27 @@ int main() {
 
     do {
         cout << "Enter x (any real number):\n";
-        while (!(cin >> x)) { // Проверка, что ввод корректный
-            cout << "Invalid input. Please enter a valid real number for x:\n";
-            cin.clear(); // Очистка флага ошибки
-            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Игнорирование неверного ввода
+        bool validInputX = false; // Флаг для проверки ввода x
+        while (!validInputX) {
+            if (cin >> x) {
+                validInputX = true; // Ввод корректен
+            } else {
+                cout << "Invalid input. Please enter a valid real number for x:\n";
+                cin.clear(); // Очистка флага ошибки
+                cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Игнорирование неверного ввода
+            }
         }
 
         cout << "Enter the alpha (positive number):\n"; 
-        while (true) {
+        bool validInputAlpha = false; // Флаг для проверки ввода alpha
+        while (!validInputAlpha) {
             cin >> alpha_n;
             if (cin.fail() || alpha_n <= 0) { // Проверка на корректный ввод и положительное значение
                 cin.clear(); // Очистка флага ошибки
                 cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Игнорирование неверного ввода
                 cout << "The alpha must be a positive number. Try again:\n";
             } else {
-                break; // Ввод корректен, выходим из цикла
+                validInputAlpha = true; // Ввод корректен
             }
         }
 
