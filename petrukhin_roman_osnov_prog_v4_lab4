@@ -1,0 +1,76 @@
+#include <iostream>
+#include <fstream>    // Библиотека для работы с файлами
+#include <cstring>    // Библиотека для работы с C-строками
+
+using namespace std;
+
+void reverseWords(char* str) {
+    // Сначала переворачиваем всю строку
+    int len = strlen(str);
+    for (int i = 0; i < len / 2; i++) {
+        swap(str[i], str[len - i - 1]);
+    }
+
+    // Переворачиваем каждое слово в строке
+    int start = 0;
+    for (int i = 0; i <= len; i++) {
+        if (str[i] == ' ' || str[i] == '\0') { // Поиск пробелов или конца строки
+            int end = i - 1;
+            while (start < end) {
+                swap(str[start], str[end]);
+                start++;
+                end--;
+            }
+            start = i + 1;  // Перейти к следующему слову
+        }
+    }
+}
+
+int main() {
+    setlocale(LC_ALL, "RU");
+    const int MAX_LENGTH = 10000;  // Максимальная длина строки
+    char buffer[MAX_LENGTH];      // Массив для хранения строки
+
+    // Ввод строки от пользователя
+    cout << "Введите строку для обработки: ";
+    cin.getline(buffer, MAX_LENGTH); // Чтение строки с пробелами
+
+    // Запись введенной строки в файл
+    ofstream outputFile("input.txt"); // Открываем файл для записи
+    if (!outputFile) { // Проверка на успешное открытие файла
+        cerr << "Не удалось открыть файл для записи." << endl;
+        return 1; // Завершаем программу с ошибкой
+    }
+    outputFile << buffer; // Записываем введенную строку в файл
+    outputFile.close(); // Закрываем файл
+
+    // Чтение из файла
+    ifstream inputFile("input.txt"); // Открываем файл для чтения
+    if (!inputFile) { // Проверка на успешное открытие файла
+        cerr << "Не удалось открыть файл входных данных." << endl;
+        return 1; // Завершаем программу с ошибкой
+    }
+
+    inputFile.getline(buffer, MAX_LENGTH); // Чтение строки из файла
+    inputFile.close(); // Закрываем файл
+
+    // Разворот слов в строке
+    reverseWords(buffer);
+
+    // Вывод перевернутой строки пользователю
+    cout << "Перевернутая строка: " << buffer << endl;
+
+    // Запись результата обратно в файл
+    outputFile.open("input.txt"); // Открываем файл для записи
+    if (!outputFile) { // Проверка на успешное открытие файла
+        cerr << "Не удалось открыть файл выходных данных." << endl;
+        return 1; // Завершаем программу с ошибкой
+    }
+
+    outputFile << buffer; // Записываем развернутую строку в файл
+    outputFile.close(); // Закрываем файл
+
+    cout << "Слова в строке развернуты и записаны в файл input.txt." << endl;
+
+    return 0; // Успешное завершение программы
+}
