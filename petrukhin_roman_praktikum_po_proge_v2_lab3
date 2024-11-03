@@ -1,0 +1,156 @@
+#include <iostream>
+#include <random>
+#include <ctime>
+#include <limits>
+#include <chrono>
+#include <algorithm>
+using namespace std;
+using namespace std::chrono;
+// Функция для печати массива
+void printArray(double* arr, int size) {
+    for (int i = 0; i < size; i++)
+        cout << arr[i] << " ";
+    cout << endl;
+}
+// Сортировка вставками
+void insertionSort(double* arr, int size) {
+    for (int i = 1; i < size; i++) {
+        double key = arr[i];
+        int j = i - 1;
+        while (j >= 0 && arr[j] > key) {
+            arr[j + 1] = arr[j];
+            j--;
+        }
+        arr[j + 1] = key;
+    }
+}
+// Сортировка слиянием в одной функции
+void mergeSort(double* arr, int left, int right) {
+    if (left < right) {
+        int mid = left + (right - left) / 2;
+        mergeSort(arr, left, mid);
+        mergeSort(arr, mid + 1, right);
+        // Слияние
+        int n1 = mid - left + 1;
+        int n2 = right - mid;
+        double* L = new double[n1];
+        double* R = new double[n2];
+        for (int i = 0; i < n1; i++)
+            L[i] = arr[left + i];
+        for (int j = 0; j < n2; j++)
+            R[j] = arr[mid + 1 + j];
+        int i = 0, j = 0, k = left;
+        while (i < n1 && j < n2) {
+            if (L[i] <= R[j]) {
+                arr[k] = L[i];
+                i++;
+            }
+            else {
+                arr[k] = R[j];
+                j++;
+            }
+            k++;
+        }
+        while (i < n1) {
+            arr[k] = L[i];
+            i++;
+            k++;
+        }
+        while (j < n2) {
+            arr[k] = R[j];
+            j++;
+            k++;
+        }
+        delete[] L;
+        delete[] R;
+    }
+}
+int main() {
+    setlocale(LC_ALL, "RU");
+    srand(time(0));
+    while (true) {
+        cout << "Выберите заполнение массива (1-рандомное заполнение, 2-полурандомное заполнение, 3-ручное заполнение, 0-выход): ";
+        char choice;
+        cin >> choice;
+        if (choice == '0') {
+            cout << "Программа завершена!" << endl;
+            break;
+        }
+        cout << "Введите размер массива: ";
+        int size;
+        while (!(cin >> size) || size <= 0) {
+            cout << "Введите положительное число: ";
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
+        double* arr = new double[size];
+        if (choice == '1') {
+            for (int i = 0; i < size; i++)
+                arr[i] = rand() % 10000;
+        }
+        else if (choice == '2') {
+            for (int i = 0; i < size; i++) {
+                arr[i] = (i % 2 == 0) ? i * i : rand() % 100;
+            }
+        }
+        else if (choice == '3') {
+            for (int i = 0; i < size; i++) {
+                cout << "Введите элемент " << i + 1 << ": ";
+                while (!(cin >> arr[i])) {
+                    cout << "Введите число: ";
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                }
+            }
+        }
+        else {
+            cout << "Неверный ввод." << endl;
+            delete[] arr;
+            continue;
+        }
+        cout << "Исходный массив: ";
+        printArray(arr, size);
+        cout << "========================" << endl;  // Горизонтальная черта
+        // Время работы стандартной сортировки
+        auto startStd = high_resolution_clock::now();
+        double* stdArr = new double[size]; // создаем копию массива для стандартной сортировки
+        copy(arr, arr + size, stdArr);
+        sort(stdArr, stdArr + size);
+        auto stopStd = high_resolution_clock::now();
+        auto stdDuration = duration_cast<microseconds>(stopStd - startStd).count();
+        cout << "Стандартно отсортированный массив: ";
+        printArray(stdArr, size);
+        cout << "Время работы стандартной сортировки: " << stdDuration << " микросекунд" << endl;
+        cout << "========================" << endl;  // Горизонтальная черта
+        // Время работы сортировки вставками
+        auto startInsertion = high_resolution_clock::now();
+        insertionSort(arr, size);
+        auto stopInsertion = high_resolution_clock::now();
+        auto insertionDuration = duration_cast<microseconds>(stopInsertion - startInsertion).count();
+        cout << "Отсортированный массив (вставками): ";
+        printArray(arr, size);
+        cout << "Время работы сортировки вставками: " << insertionDuration << " микросекунд" << endl;
+        cout << "========================" << endl;  // Горизонтальная черта
+        // Время работы сортировки слиянием
+        double* mergeArr = new double[size];
+        copy(arr, arr + size, mergeArr);
+        auto startMerge = high_resolution_clock::now();
+        mergeSort(mergeArr, 0, size - 1);
+        auto stopMerge = high_resolution_clock::now();
+        auto mergeDuration = duration_cast<microseconds>(stopMerge - startMerge).count();
+        cout << "Отсортированный массив (слияние): ";
+        printArray(mergeArr, size);
+        cout << "Время работы сортировки слиянием: " << mergeDuration << " микросекунд" << endl;
+        cout << "========================" << endl;  // Горизонтальная черта
+        // Вычисляем ускорение
+        double speedUpInsertion = static_cast<double>(stdDuration) / insertionDuration;
+        double speedUpMerge = static_cast<double>(stdDuration) / mergeDuration;
+        cout << "Ускорение сортировки вставками: " << speedUpInsertion  << endl;
+        cout << "Ускорение сортировки слиянием: " << speedUpMerge << endl;
+        cout << "========================" << endl;  // Горизонтальная черта
+        delete[] arr;
+        delete[] stdArr;
+        delete[] mergeArr;
+    }
+    return 0;
+}
