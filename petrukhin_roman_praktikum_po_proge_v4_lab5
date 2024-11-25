@@ -41,7 +41,7 @@ public:
         for (double length : lengths) {
             perim += length;
         }
-        return perim; 
+        return perim;
     }
 
     double fence() const {
@@ -64,12 +64,12 @@ public:
             in >> numSides;
 
             // Проверка на корректный ввод
-            if (in.fail() || numSides <= 0) {
+            if (in.fail() || numSides < 3 || cin.peek() != '\n') {
                 in.clear(); // Сбрасываем состояние ошибки
                 in.ignore(numeric_limits<streamsize>::max(), '\n'); // Очищаем входной буфер
-                cout << "Ошибка: количество сторон должно быть положительным числом. Попробуйте снова: ";
+                cout << "Ошибка. Попробуйте снова: ";
             }
-        } while (in.fail() || numSides <= 0); // Условие продолжения цикла
+        } while (in.fail() || numSides <= 0 || cin.peek() != '\n'); // Условие продолжения цикла
 
         polygon.lengths.resize(numSides);
         for (int i = 0; i < numSides; ++i) {
@@ -80,10 +80,10 @@ public:
                 in >> length;
 
                 // Проверка на корректный ввод
-                if (in.fail() || length <= 0) {
+                if (in.fail() || length <= 0 || cin.peek() != '\n') {
                     in.clear(); // Сбрасываем состояние ошибки
                     in.ignore(numeric_limits<streamsize>::max(), '\n'); // Очищаем входной буфер
-                    cout << "Ошибка: длина стороны должна быть положительным числом. Попробуйте снова: ";
+                    cout << "Ошибка. Попробуйте снова: ";
                 }
                 else {
                     polygon.lengths[i] = length; // Запоминаем длину стороны
@@ -119,12 +119,12 @@ static void readDataFromConsole(nAngle& polygon) {
         cin >> plots;
 
         // Проверка на корректный ввод
-        if (cin.fail() || plots <= 0) {
+        if (cin.fail() || plots <= 0 || cin.peek() != '\n') {
             cin.clear(); // Сбрасываем состояние ошибки
             cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Очищаем входной буфер
             cout << "Ошибка: количество участков должно быть положительным числом. Попробуйте снова: ";
         }
-    } while (cin.fail() || plots <= 0);
+    } while (cin.fail() || plots <= 0 || cin.peek() != '\n');
 
     polygon = nAngle(name, plots); // Устанавливаем значения
     cin >> polygon; // Считываем многоугольник
@@ -142,7 +142,7 @@ static void readDataFromFile(nAngle& polygon, const string& filename) {
 static void writeDataToConsole(const nAngle& polygon) {
     cout << "Данные о межевании:\n" << polygon;
     cout << "Периметр многоугольника: " << polygon.perimeter() << endl;
-    cout << "Длина забора участков: "  << polygon.fence() << endl;
+    cout << "Длина забора участков: " << polygon.fence() << endl;
 }
 
 static void writeDataToFile(const nAngle& polygon, const string& filename) {
