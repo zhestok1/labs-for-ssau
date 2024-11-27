@@ -4,6 +4,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <limits>
 
 using namespace std;
 
@@ -15,31 +16,32 @@ void archive(const string& inputFile, const string& outputFile) {
     }
 
     map<string, int> dictionary;
-    vector<string> words; // чтобы сохранить все слова в порядке
     string word;
     int index = 0;
 
     while (inFile >> word) {
-        words.push_back(word); // сохраняем все слова
         if (dictionary.find(word) == dictionary.end()) {
             dictionary[word] = index++;
         }
     }
 
     inFile.close();
+
     ofstream outFile(outputFile);
     if (!outFile) {
         cerr << "Не удалось открыть файл для записи." << endl;
         return;
     }
 
+    // Записываем только уникальные слова и их индексы
     for (const auto& pair : dictionary) {
         outFile << pair.first << " " << pair.second << endl;
     }
 
     outFile << "---СЛОВА---" << endl; // Разделитель
-    for (const auto& w : words) {
-        outFile << w << endl; // Сохраняем все слова
+    // Записываем индексы слов
+    for (const auto& pair : dictionary) {
+        outFile << pair.second << endl; // Запись индекса слова
     }
 
     outFile.close();
@@ -70,9 +72,11 @@ void dearchive(const string& inputFile, const string& outputFile) {
         return;
     }
 
+    // Теперь восстанавливаем слова по индексам
     while (getline(inFile, line)) {
+        index = stoi(line); // Преобразование строки в индекс
         if (reverseDictionary.find(index) != reverseDictionary.end()) {
-            outFile << line << endl; // Восстанавливаем слова
+            outFile << reverseDictionary[index] << endl; // Восстанавливаем слово по индексу
         }
     }
 
@@ -92,11 +96,11 @@ int main() {
 
     switch (answer) {
     case '1':
-        archive(filename, filename); 
+        archive(filename, filename);
         cout << "Файл успешно заархивирован." << endl;
         break;
     case '2':
-        dearchive(filename, filename); 
+        dearchive(filename, filename);
         cout << "Файл успешно деарахирован." << endl;
         break;
     default:
