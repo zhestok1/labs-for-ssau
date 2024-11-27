@@ -74,7 +74,7 @@ void dearchive(const string& inputFile, const string& outputFile) {
 
     // Теперь восстанавливаем слова по индексам
     while (getline(inFile, line)) {
-        index = stoi(line); // Преобразование строки в индекс
+        index = stoi(line); // Преобразование строки в индекс, делается после --слова--
         if (reverseDictionary.find(index) != reverseDictionary.end()) {
             outFile << reverseDictionary[index] << endl; // Восстанавливаем слово по индексу
         }
