@@ -1,0 +1,108 @@
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <map>
+#include <vector>
+#include <string>
+
+using namespace std;
+
+void archive(const string& inputFile, const string& outputFile) {
+    ifstream inFile(inputFile);
+    if (!inFile) {
+        cerr << "Не удалось открыть файл для чтения." << endl;
+        return;
+    }
+
+    map<string, int> dictionary;
+    vector<string> words; // чтобы сохранить все слова в порядке
+    string word;
+    int index = 0;
+
+    while (inFile >> word) {
+        words.push_back(word); // сохраняем все слова
+        if (dictionary.find(word) == dictionary.end()) {
+            dictionary[word] = index++;
+        }
+    }
+
+    inFile.close();
+    ofstream outFile(outputFile);
+    if (!outFile) {
+        cerr << "Не удалось открыть файл для записи." << endl;
+        return;
+    }
+
+    for (const auto& pair : dictionary) {
+        outFile << pair.first << " " << pair.second << endl;
+    }
+
+    outFile << "---СЛОВА---" << endl; // Разделитель
+    for (const auto& w : words) {
+        outFile << w << endl; // Сохраняем все слова
+    }
+
+    outFile.close();
+}
+
+void dearchive(const string& inputFile, const string& outputFile) {
+    ifstream inFile(inputFile);
+    if (!inFile) {
+        cerr << "Не удалось открыть файл для чтения." << endl;
+        return;
+    }
+
+    map<int, string> reverseDictionary;
+    string line;
+    int index;
+
+    // Читаем слово и индекс для построения обратного словаря
+    while (inFile >> line >> index) {
+        reverseDictionary[index] = line;
+    }
+
+    // Пропустить разделитель
+    inFile.ignore(numeric_limits<streamsize>::max(), '\n');
+
+    ofstream outFile(outputFile);
+    if (!outFile) {
+        cerr << "Не удалось открыть файл для записи." << endl;
+        return;
+    }
+
+    while (getline(inFile, line)) {
+        if (reverseDictionary.find(index) != reverseDictionary.end()) {
+            outFile << line << endl; // Восстанавливаем слова
+        }
+    }
+
+    outFile.close();
+}
+
+int main() {
+    setlocale(LC_ALL, "ru");
+    string filename;
+    char answer;
+
+    cout << "Введите имя файла: ";
+    cin >> filename;
+
+    cout << "Выберите действие: \n1 - Архивация\n2 - Дехврахивация\nВведите 1 или 2: ";
+    cin >> answer;
+
+    switch (answer) {
+    case '1':
+        archive(filename, filename); 
+        cout << "Файл успешно заархивирован." << endl;
+        break;
+    case '2':
+        dearchive(filename, filename); 
+        cout << "Файл успешно деарахирован." << endl;
+        break;
+    default:
+        cout << "Неверный выбор. Пожалуйста, введите 1 или 2." << endl;
+        break;
+    }
+
+    return 0;
+}
