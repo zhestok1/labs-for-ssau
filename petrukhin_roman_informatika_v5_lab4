@@ -20,7 +20,7 @@ void archive(const string& inputFile, const string& outputFile) {
     int index = 0;
 
     while (inFile >> word) {
-        if (dictionary.find(word) == dictionary.end()) {
+        if (dictionary.find(word) == dictionary.end()) { // Если дошёл до последнего значит в словаре нет
             dictionary[word] = index++;
         }
     }
