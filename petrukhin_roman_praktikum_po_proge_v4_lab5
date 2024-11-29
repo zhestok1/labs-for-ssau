@@ -67,7 +67,7 @@ public:
             if (in.fail() || numSides < 3 || cin.peek() != '\n') {
                 in.clear(); // Сбрасываем состояние ошибки
                 in.ignore(numeric_limits<streamsize>::max(), '\n'); // Очищаем входной буфер
-                cout << "Error. Try again: ";
+                cout << "Error. Num of sides must be >= 3. Try again: ";
             }
         } while (in.fail() || numSides <= 0 || cin.peek() != '\n'); // Условие продолжения цикла
 
@@ -83,7 +83,7 @@ public:
                 if (in.fail() || length <= 0 || cin.peek() != '\n') {
                     in.clear(); // Сбрасываем состояние ошибки
                     in.ignore(numeric_limits<streamsize>::max(), '\n'); // Очищаем входной буфер
-                    cout << "Error. Try again: ";
+                    cout << "Error. Length must be positive number. Try again: ";
                 }
                 else {
                     polygon.lengths[i] = length; // Запоминаем длину стороны
@@ -107,7 +107,7 @@ public:
 };
 
 // Функции для работы с данными
-static void readDataFromConsole(nAngle& polygon) {
+void readDataFromConsole(nAngle& polygon) {
     cout << "Enter the name of the locality: ";
     string name;
     cin.ignore(); // Очищаем входной поток перед использованием getline
@@ -130,7 +130,7 @@ static void readDataFromConsole(nAngle& polygon) {
     cin >> polygon; // Считываем многоугольник
 }
 
-static void readDataFromFile(nAngle& polygon, const string& filename) {
+void readDataFromFile(nAngle& polygon, const string& filename) {
     ifstream inFile(filename);
     if (!inFile) {
         cerr << "Error opening file!" << endl;
@@ -139,13 +139,13 @@ static void readDataFromFile(nAngle& polygon, const string& filename) {
     inFile >> polygon; // Проверка на успешное считывание из файла
 }
 
-static void writeDataToConsole(const nAngle& polygon) {
+void writeDataToConsole(const nAngle& polygon) {
     cout << "Survey data:\n" << polygon;
     cout << "Polygon perimeter: " << polygon.perimeter() << endl;
     cout << "Fence length: " << polygon.fence() << endl;
 }
 
-static void writeDataToFile(const nAngle& polygon, const string& filename) {
+void writeDataToFile(const nAngle& polygon, const string& filename) {
     ofstream outFile(filename);
     if (!outFile) {
         cerr << "Error opening file for writing!" << endl;
