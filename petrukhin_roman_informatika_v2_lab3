@@ -7,9 +7,9 @@ using namespace std;
 // Функция для нахождения НОД двух чисел
 int gcd(int a, int b) {
     while (b != 0) {
-        int temp = b;
+        int buf = b;
         b = a % b;
-        a = temp;
+        a = buf;
     }
     return a;
 }
@@ -17,7 +17,7 @@ int gcd(int a, int b) {
 // Функция для нахождения НОД для массива чисел
 int findGCD(const vector<int>& numbers) {
     int result = numbers[0];
-    for (size_t i = 1; i < numbers.size(); ++i) {
+    for (int i = 1; i < numbers.size(); ++i) {
         result = gcd(result, numbers[i]);
         if (result == 1) {
             return 1; // НОД не может быть меньше 1
@@ -27,6 +27,7 @@ int findGCD(const vector<int>& numbers) {
 }
 
 int main() {
+    setlocale(LC_ALL, "ru");
     vector<int> numbers;
     int n, num;
 
