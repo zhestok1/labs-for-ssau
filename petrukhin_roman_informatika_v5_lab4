@@ -2,16 +2,28 @@
 #include <fstream>
 #include <sstream>
 #include <map>
-#include <vector>
 #include <string>
 #include <limits>
+#include <stdexcept>
 
 using namespace std;
+
+void word_index(const map<string, int>& dictionary, const string& filename) {
+    ofstream outFile(filename);
+    if (outFile) {
+        for (const auto& pair : dictionary) {
+            outFile << pair.first << " " << pair.second << endl;
+        }
+    }
+    else {
+        cerr << "Не удалось открыть файл " << filename << " для записи." << endl;
+    }
+}
 
 void archive(const string& inputFile, const string& outputFile) {
     ifstream inFile(inputFile);
     if (!inFile) {
-        cerr << "Не удалось открыть файл для чтения." << endl;
+        cerr << "Не удалось открыть файл " << inputFile << " для чтения." << endl;
         return;
     }
 
@@ -20,37 +32,30 @@ void archive(const string& inputFile, const string& outputFile) {
     int index = 0;
 
     while (inFile >> word) {
-        if (dictionary.find(word) == dictionary.end()) { // Если дошёл до последнего значит в словаре нет
+        if (dictionary.find(word) == dictionary.end()) {
             dictionary[word] = index++;
         }
     }
 
-    inFile.close();
+    word_index(dictionary, "logs.txt");
 
     ofstream outFile(outputFile);
     if (!outFile) {
-        cerr << "Не удалось открыть файл для записи." << endl;
+        cerr << "Не удалось открыть файл " << outputFile << " для записи." << endl;
         return;
     }
 
-    // Записываем только уникальные слова и их индексы
     for (const auto& pair : dictionary) {
-        outFile << pair.first << " " << pair.second << endl;
-    }
-
-    outFile << "---СЛОВА---" << endl; // Разделитель
-    // Записываем индексы слов
-    for (const auto& pair : dictionary) {
-        outFile << pair.second << endl; // Запись индекса слова
+        outFile << pair.second << endl; // Записываем индексы слов для архивации
     }
 
     outFile.close();
 }
 
 void dearchive(const string& inputFile, const string& outputFile) {
-    ifstream inFile(inputFile);
+    ifstream inFile("logs.txt");
     if (!inFile) {
-        cerr << "Не удалось открыть файл для чтения." << endl;
+        cerr << "Не удалось открыть файл logs.txt для чтения." << endl;
         return;
     }
 
@@ -58,25 +63,40 @@ void dearchive(const string& inputFile, const string& outputFile) {
     string line;
     int index;
 
-    // Читаем слово и индекс для построения обратного словаря
-    while (inFile >> line >> index) {
-        reverseDictionary[index] = line;
+    while (getline(inFile, line)) {
+        istringstream str(line);
+        str >> index; // Считываем индекс из потока
+        string word;
+        getline(str, word); // Считываем слово после индекса
+        reverseDictionary[index] = word; // Добавляем в обратный словарь
     }
 
-    // Пропустить разделитель
-    inFile.ignore(numeric_limits<streamsize>::max(), '\n');
+    inFile.close();
 
-    ofstream outFile(outputFile);
-    if (!outFile) {
-        cerr << "Не удалось открыть файл для записи." << endl;
+    ifstream indexFile(inputFile);
+    if (!indexFile) {
+        cerr << "Не удалось открыть файл " << inputFile << " для чтения индексов." << endl;
         return;
     }
 
-    // Теперь восстанавливаем слова по индексам
-    while (getline(inFile, line)) {
-        index = stoi(line); // Преобразование строки в индекс, делается после --слова--
-        if (reverseDictionary.find(index) != reverseDictionary.end()) {
-            outFile << reverseDictionary[index] << endl; // Восстанавливаем слово по индексу
+    ofstream outFile(outputFile);
+    if (!outFile) {
+        cerr << "Не удалось открыть файл " << outputFile << " для записи." << endl;
+        return;
+    }
+
+    while (getline(indexFile, line)) {
+        try {
+            index = stoi(line);
+            if (reverseDictionary.find(index) != reverseDictionary.end()) {
+                outFile << reverseDictionary[index] << endl;
+            }
+            else {
+                cerr << "Индекс " << index << " не найден в словаре." << endl;
+            }
+        }
+        catch (const invalid_argument& e) {
+            cerr << "Ошибка преобразования: " << e.what() << " для строки " << line << endl;
         }
     }
 
@@ -96,12 +116,12 @@ int main() {
 
     switch (answer) {
     case '1':
-        archive(filename, filename);
+        archive(filename + ".txt", filename + ".txt");
         cout << "Файл успешно заархивирован." << endl;
         break;
     case '2':
-        dearchive(filename, filename);
-        cout << "Файл успешно деарахирован." << endl;
+        dearchive(filename + ".txt", filename + ".txt");
+        cout << "Файл успешно деархивирован." << endl;
         break;
     default:
         cout << "Неверный выбор. Пожалуйста, введите 1 или 2." << endl;
