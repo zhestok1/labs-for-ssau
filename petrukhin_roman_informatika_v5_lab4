@@ -66,7 +66,7 @@ void dearchive(const string& inputFile, const string& outputFile) {
     while (getline(inFile, line)) {
         istringstream str(line);       
         string word;
-        getline(str, word); // Считываем слово после индекса
+        getline(str, word); // Считываем слово 
         str >> index; // Считываем индекс из потока
         reverseDictionary[index] = word; // Добавляем в обратный словарь
     }
