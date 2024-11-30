@@ -5,7 +5,7 @@
 using namespace std;
 
 // Функция для нахождения НОД двух чисел
-int gcd(int a, int b) {
+int nod(int a, int b) {
     while (b != 0) {
         int buf = b;
         b = a % b;
@@ -15,10 +15,10 @@ int gcd(int a, int b) {
 }
 
 // Функция для нахождения НОД для массива чисел
-int findGCD(const vector<int>& numbers) {
+int massNOD(const vector<int>& numbers) {
     int result = numbers[0];
     for (int i = 1; i < numbers.size(); ++i) {
-        result = gcd(result, numbers[i]);
+        result = nod(result, numbers[i]);
         if (result == 1) {
             return 1; // НОД не может быть меньше 1
         }
@@ -53,7 +53,7 @@ int main() {
         return 0;
     }
 
-    int result = findGCD(numbers);
+    int result = massNOD(numbers);
     cout << "Наибольший общий делитель: " << result << endl;
 
     return 0;
