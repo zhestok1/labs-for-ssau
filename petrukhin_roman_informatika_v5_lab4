@@ -27,30 +27,31 @@ void archive(const string& inputFile, const string& outputFile) {
         vec.push_back(dictionary[word]); // Используем существующий индекс
     }
 
+    inFile.close();
+
     ofstream outFile(outputFile);
     if (!outFile) {
         cerr << "Не удалось открыть файл " << outputFile << " для записи." << endl;
         return;
     }
 
+    // Запись словаря и индексов в один файл
+    for (const auto& pair : dictionary) {
+        outFile << pair.first << " " << pair.second << endl; // Записываем слово и индекс
+    }
+
+    outFile << "---" << endl; // Разделитель для индексов
+
     for (const int& index : vec) {
         outFile << index << endl; // Записываем индексы слов для архивации
     }
-
-    // Запись слов в лог
-    ofstream logFile("logs.txt", ios::app);
-    for (const auto& pair : dictionary) {
-        logFile << pair.first << " " << pair.second << endl; // Записываем слово и индекс
-    }
-
     outFile.close();
-    logFile.close();
 }
 
 void dearchive(const string& inputFile, const string& outputFile) {
-    ifstream inFile("logs.txt");
+    ifstream inFile(inputFile);
     if (!inFile) {
-        cerr << "Не удалось открыть файл logs.txt для чтения." << endl;
+        cerr << "Не удалось открыть файл " << inputFile << " для чтения." << endl;
         return;
     }
 
@@ -59,6 +60,7 @@ void dearchive(const string& inputFile, const string& outputFile) {
     int index;
 
     while (getline(inFile, line)) {
+        if (line == "---") break; // Прекращаем считывание словаря
         istringstream str(line);
         string word;
         str >> word; // Считываем слово
@@ -68,29 +70,33 @@ void dearchive(const string& inputFile, const string& outputFile) {
 
     inFile.close();
 
-    ifstream indexFile(inputFile);
-    if (!indexFile) {
-        cerr << "Не удалось открыть файл " << inputFile << " для чтения индексов." << endl;
-        return;
-    }
-
-
+    inFile.open(inputFile); // Снова открываем файл для чтения индексов
+    bool readingIndexes = false;
     string outputWords; // Хранит результирующие слова
-    while (getline(indexFile, line)) {
-        try {
-            index = stoi(line);
-            if (reverseDictionary.find(index) != reverseDictionary.end()) {
-                outputWords += reverseDictionary[index] + " "; // Добавляем слово в строку
-            } else {
-                cerr << "Индекс " << index << " не найден в словаре." << endl;
+
+    while (getline(inFile, line)) {
+        if (line == "---") {
+            readingIndexes = true; // Начинаем считывать индексы
+            continue;
+        }
+
+        if (readingIndexes) {
+            try {
+                index = stoi(line);
+                if (reverseDictionary.find(index) != reverseDictionary.end()) {
+                    outputWords += reverseDictionary[index] + " "; // Добавляем слово в строку
+                }
+                else {
+                    cerr << "Индекс " << index << " не найден в словаре." << endl;
+                }
+            }
+            catch (const invalid_argument& e) {
+                cerr << "Ошибка преобразования: " << e.what() << " для строки " << line << endl;
             }
         }
-        catch (const invalid_argument& e) {
-            cerr << "Ошибка преобразования: " << e.what() << " для строки " << line << endl;
-        }
     }
 
-    indexFile.close();
+    inFile.close();
 
     // Теперь выводим слова в одну строку
     cout << "Результат деархивации: " << outputWords << endl;
@@ -101,7 +107,7 @@ void dearchive(const string& inputFile, const string& outputFile) {
         cerr << "Не удалось открыть файл " << outputFile << " для записи." << endl;
         return;
     }
-    
+
     outFile << outputWords; // Записываем в выходной файл, если требуется
     outFile.close();
 }
@@ -119,11 +125,11 @@ int main() {
 
     switch (answer) {
     case '1':
-        archive(filename + ".txt", filename + ".txt");
+        archive(filename + ".txt", filename + ".archive.txt");
         cout << "Файл успешно заархивирован." << endl;
         break;
     case '2':
-        dearchive(filename + ".txt", filename + ".txt");
+        dearchive(filename + ".archive.txt", filename + ".txt");
         cout << "Файл успешно деархивирован." << endl;
         break;
     default:
