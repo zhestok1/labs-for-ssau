@@ -3,22 +3,9 @@
 #include <sstream>
 #include <map>
 #include <string>
-#include <limits>
-#include <stdexcept>
+#include <vector>
 
 using namespace std;
-
-void word_index(const map<string, int>& dictionary, const string& filename) {
-    ofstream outFile(filename);
-    if (outFile) {
-        for (const auto& pair : dictionary) {
-            outFile << pair.first << " " << pair.second << endl;
-        }
-    }
-    else {
-        cerr << "Не удалось открыть файл " << filename << " для записи." << endl;
-    }
-}
 
 void archive(const string& inputFile, const string& outputFile) {
     ifstream inFile(inputFile);
@@ -30,14 +17,15 @@ void archive(const string& inputFile, const string& outputFile) {
     map<string, int> dictionary;
     string word;
     int index = 0;
+    vector<int> vec;
 
+    // Запись слов и индексов в словарь
     while (inFile >> word) {
         if (dictionary.find(word) == dictionary.end()) {
             dictionary[word] = index++;
         }
+        vec.push_back(dictionary[word]); // Используем существующий индекс
     }
-
-    word_index(dictionary, "logs.txt");
 
     ofstream outFile(outputFile);
     if (!outFile) {
@@ -45,11 +33,18 @@ void archive(const string& inputFile, const string& outputFile) {
         return;
     }
 
+    for (const int& index : vec) {
+        outFile << index << endl; // Записываем индексы слов для архивации
+    }
+
+    // Запись слов в лог
+    ofstream logFile("logs.txt", ios::app);
     for (const auto& pair : dictionary) {
-        outFile << pair.second << endl; // Записываем индексы слов для архивации
+        logFile << pair.first << " " << pair.second << endl; // Записываем слово и индекс
     }
 
     outFile.close();
+    logFile.close();
 }
 
 void dearchive(const string& inputFile, const string& outputFile) {
@@ -64,10 +59,10 @@ void dearchive(const string& inputFile, const string& outputFile) {
     int index;
 
     while (getline(inFile, line)) {
-        istringstream str(line);       
+        istringstream str(line);
         string word;
-        getline(str, word); // Считываем слово 
-        str >> index; // Считываем индекс из потока(сразу int)
+        str >> word; // Считываем слово
+        str >> index; // Считываем индекс
         reverseDictionary[index] = word; // Добавляем в обратный словарь
     }
 
@@ -79,19 +74,14 @@ void dearchive(const string& inputFile, const string& outputFile) {
         return;
     }
 
-    ofstream outFile(outputFile);
-    if (!outFile) {
-        cerr << "Не удалось открыть файл " << outputFile << " для записи." << endl;
-        return;
-    }
 
+    string outputWords; // Хранит результирующие слова
     while (getline(indexFile, line)) {
         try {
             index = stoi(line);
             if (reverseDictionary.find(index) != reverseDictionary.end()) {
-                outFile << reverseDictionary[index] << endl;
-            }
-            else {
+                outputWords += reverseDictionary[index] + " "; // Добавляем слово в строку
+            } else {
                 cerr << "Индекс " << index << " не найден в словаре." << endl;
             }
         }
@@ -100,6 +90,19 @@ void dearchive(const string& inputFile, const string& outputFile) {
         }
     }
 
+    indexFile.close();
+
+    // Теперь выводим слова в одну строку
+    cout << "Результат деархивации: " << outputWords << endl;
+
+    // Можно записать результаты в выходной файл, если это нужно
+    ofstream outFile(outputFile);
+    if (!outFile) {
+        cerr << "Не удалось открыть файл " << outputFile << " для записи." << endl;
+        return;
+    }
+    
+    outFile << outputWords; // Записываем в выходной файл, если требуется
     outFile.close();
 }
 
