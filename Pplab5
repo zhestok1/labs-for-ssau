@@ -1,0 +1,204 @@
+#include <iostream>
+#include <vector>
+#include <limits>
+#include <string>
+#include <fstream>
+
+using namespace std;
+
+// Класс для хранения данных о межевании
+class CadastralData {
+private:
+    string locationName;  // Название населённого пункта
+    int numberOfPlots;    // Количество участков
+
+public:
+    CadastralData(const string& name = "", int plots = 0)
+        : locationName(name), numberOfPlots(plots) {}
+
+    void displayHeaders() const {
+        cout << "Name of the locality: " << locationName << endl;
+        cout << "Number of plots: " << numberOfPlots << endl;
+    }
+
+    void setLocationName(const string& name) {
+        locationName = name;
+    }
+
+    void setNumberOfPlots(int plots) {
+        numberOfPlots = plots;
+    }
+};
+
+// Класс для многоугольников
+class nAngle {
+private:
+    CadastralData cadastralData; // Объект класса CadastralData
+    vector<double> lengths;       // Длины сторон многоугольников
+
+public:
+    nAngle(const string& name = "", int plots = 0)
+        : cadastralData(name, plots) {}
+
+    double perimeter() const {
+        double perim = 0;
+        for (double length : lengths) {
+            perim += length;
+        }
+        return perim;
+    }
+
+    double fence() const {
+        return perimeter() * lengths.size();
+    }
+
+    // Перегрузка ввода
+    friend istream& operator>>(istream& in, nAngle& polygon) {
+        polygon.cadastralData.displayHeaders();  // Вывод заголовков
+
+        int numSides;
+        cout << "Enter number of sides: ";
+        do {
+            in >> numSides;
+
+            // Проверка на корректный ввод
+            if (in.fail() || numSides < 3 || cin.peek() != '\n') {
+                in.clear(); // Сбрасываем состояние ошибки
+                in.ignore(numeric_limits<streamsize>::max(), '\n'); // Очищаем входной буфер
+                cout << "Error. Number of sides must be >= 3. Try again: ";
+            }
+        } while (in.fail() || numSides < 3 || cin.peek() != '\n');
+
+        polygon.lengths.resize(numSides);
+        for (int i = 0; i < numSides; ++i) {
+            double length;
+            cout << "Enter the length of side " << (i + 1) << ": ";
+            bool validInput = false; // Переменная для отслеживания корректности ввода
+            do {
+                in >> length;
+
+                // Проверка на корректный ввод
+                if (in.fail() || length <= 0 || cin.peek() != '\n') {
+                    in.clear(); // Сбрасываем состояние ошибки
+                    in.ignore(numeric_limits<streamsize>::max(), '\n'); // Очищаем входной буфер
+                    cout << "Error. Length must be a positive number. Try again: ";
+                } else {
+                    polygon.lengths[i] = length; // Запоминаем длину стороны
+                    validInput = true; // Устанавливаем флаг ввода как корректный
+                }
+            } while (!validInput);
+        }
+
+        return in;
+    }
+
+    // Перегрузка вывода
+    friend ostream& operator<<(ostream& out, const nAngle& polygon) {
+        polygon.cadastralData.displayHeaders(); // Вывод заголовков
+        out << "Side lengths: ";
+        for (double length : polygon.lengths) {
+            out << length << " ";
+        }
+        out << endl; // Добавляем перевод строки после вывода длин сторон
+        return out;
+    }
+};
+
+// Функции для работы с данными
+void readDataFromConsole(nAngle& polygon) {
+    cout << "Enter the name of the locality: ";
+    string name;
+    cin.ignore(); // Очищаем входной поток перед использованием getline
+    getline(cin, name); // Считываем название населенного пункта
+
+    int plots;
+    cout << "Enter the number of plots: ";
+    do {
+        cin >> plots;
+
+        // Проверка на корректный ввод
+        if (cin.fail() || plots <= 0 || cin.peek() != '\n') {
+            cin.clear(); // Сбрасываем состояние ошибки
+                        cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Очищаем входной буфер
+            cout << "Error: Number of parcels must be a positive number. Try again: ";
+        }
+    } while (cin.fail() || plots <= 0 || cin.peek() != '\n');
+
+    polygon = nAngle(name, plots); // Устанавливаем значения
+    cin >> polygon; // Считываем многоугольник
+}
+
+void readDataFromFile(nAngle& polygon, const string& filename) {
+    ifstream inFile(filename);
+    if (!inFile) {
+        cerr << "Error opening file!" << endl;
+        exit(1);
+    }
+    inFile >> polygon; // Проверка на успешное считывание из файла
+}
+
+void writeDataToConsole(const nAngle& polygon) {
+    cout << "Survey data:\n" << polygon;
+    cout << "Polygon perimeter: " << polygon.perimeter() << endl;
+    cout << "Fence length: " << polygon.fence() << endl;
+}
+
+void writeDataToFile(const nAngle& polygon, const string& filename) {
+    ofstream outFile(filename);
+    if (!outFile) {
+        cerr << "Error opening file for writing!" << endl;
+        exit(1);
+    }
+    outFile << "Survey data:\n" << polygon;
+    outFile << "Polygon perimeter: " << polygon.perimeter() << endl;
+    outFile << "Fence length: " << polygon.fence() << endl;
+}
+
+int main() {
+    int choice;
+    bool continueProgram = true;
+
+    do {
+        nAngle polygon;  // Инициализация пустого объекта
+
+        cout << "Select data source:\n1. Console\n2. File\n3. Exit\nYour choice: ";
+        cin >> choice;
+
+        if (choice == 1) {
+            readDataFromConsole(polygon);
+        }
+        else if (choice == 2) {
+            string filename;
+            cout << "Enter the file name to read: ";
+            cin >> filename;
+            readDataFromFile(polygon, filename);
+        }
+        else {
+            continueProgram = false; // Завершение программы при выборе выхода
+            continue; // Переход к следующей итерации цикла
+        }
+
+        // Проверка, продолжать ли вывод
+        if (continueProgram) {
+            cout << "Select the output method:\n1. Console\n2. File\n3. Exit\nYour choice: ";
+            cin >> choice;
+
+            if (choice == 1) {
+                writeDataToConsole(polygon);
+            }
+            else if (choice == 2) {
+                string filename;
+                cout << "Enter the filename: ";
+                cin >> filename;
+                writeDataToFile(polygon, filename);
+            }
+            else {
+                continueProgram = false; // Завершение программы при выборе выхода
+            }
+        }
+
+    } while (continueProgram);
+
+    cout << "Program completed!" << endl;
+    return 0;
+}
