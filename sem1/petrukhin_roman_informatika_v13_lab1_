@@ -1,0 +1,61 @@
+/*Цифровым корнем целого неотрицательного числа называется
+цифра, являющаяся результатом последовательной замены текущего
+числа суммой его цифр. Программа должна вычислять цифровой
+корень заданного целого неотрицательного числа.*/
+
+#include <iostream>
+#include <limits>
+using namespace std;
+
+int digital_root(int n) {
+    while (n >= 10) {
+        int sum = 0;
+        while (n > 0) {
+            sum += n % 10; // Добавляем последнюю цифру к сумме
+            n /= 10;        // Убираем последнюю цифру
+        }
+        n = sum;           // Обновляем n с суммой цифр
+    }
+    return n;           // Возвращаем цифровой корень
+}
+
+int main() {
+    bool running = true; // Флаг для управления главными циклами
+
+    while (running) { // Бесконечный цикл
+        int number;
+        bool validInput = false; // Флаг для проверки корректности ввода
+
+        // Цикл для ввода числа
+        while (!validInput) {
+            cout << "Enter your number: ";
+            cin >> number;
+
+            // Проверка на ввод
+            if (cin.fail() || number < 0) {
+                cin.clear(); // Сброс флага ошибки
+                cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Очистка входного буфера
+                cout << "Invalid input. Please enter a positive integer." << endl; 
+            }
+            else {
+                validInput = true; // Установка флага при корректном вводе
+            }
+        }
+
+        int result = digital_root(number); 
+        cout << "The digital root of " << number << " is " << result << "." << endl; 
+
+        // Запрос на продолжение
+        char choice;
+        cout << "Do you want to continue? (y/n): ";
+        cin >> choice;
+
+        // Проверка на продолжение
+        if (choice != 'y' && choice != 'Y') {
+            running = false; // Устанавливаем флаг завершения главного цикла
+        }
+    }
+
+    cout << "Exiting the program." << endl; 
+    return 0; 
+}
