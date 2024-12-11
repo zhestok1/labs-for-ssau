@@ -1,0 +1,141 @@
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <map>
+#include <string>
+#include <vector>
+
+using namespace std;
+
+void archive(const string& inputFile, const string& outputFile) {
+    ifstream inFile(inputFile);
+    if (!inFile) {
+        cerr << "Не удалось открыть файл " << inputFile << " для чтения." << endl;
+        return;
+    }
+
+    map<string, int> dictionary;
+    string word;
+    int index = 0;
+    vector<int> vec;
+
+    // Запись слов и индексов в словарь
+    while (inFile >> word) {
+        if (dictionary.find(word) == dictionary.end()) {
+            dictionary[word] = index++;
+        }
+        vec.push_back(dictionary[word]); // Используем существующий индекс
+    }
+
+    inFile.close();
+
+    ofstream outFile(outputFile);
+    if (!outFile) {
+        cerr << "Не удалось открыть файл " << outputFile << " для записи." << endl;
+        return;
+    }
+
+    // Запись словаря и индексов в один файл
+    for (const auto& pair : dictionary) {
+        outFile << pair.first << " " << pair.second << endl; // Записываем слово и индекс
+    }
+
+    outFile << "---" << endl; // Разделитель для индексов
+
+    for (const int& index : vec) {
+        outFile << index << endl; // Записываем индексы слов для архивации
+    }
+    outFile.close();
+}
+
+void dearchive(const string& inputFile, const string& outputFile) {
+    ifstream inFile(inputFile);
+    if (!inFile) {
+        cerr << "Не удалось открыть файл " << inputFile << " для чтения." << endl;
+        return;
+    }
+
+    map<int, string> reverseDictionary;
+    string line;
+    int index;
+
+    while (getline(inFile, line)) {
+        if (line == "---") break; // Прекращаем считывание словаря
+        istringstream str(line);
+        string word;
+        str >> word; // Считываем слово
+        str >> index; // Считываем индекс
+        reverseDictionary[index] = word; // Добавляем в обратный словарь
+    }
+
+    inFile.close();
+
+    inFile.open(inputFile); // Снова открываем файл для чтения индексов
+    bool readingIndexes = false;
+    string outputWords; // Хранит результирующие слова
+
+    while (getline(inFile, line)) {
+        if (line == "---") {
+            readingIndexes = true; // Начинаем считывать индексы
+            continue;
+        }
+
+        if (readingIndexes) {
+            try {
+                index = stoi(line);
+                if (reverseDictionary.find(index) != reverseDictionary.end()) {
+                    outputWords += reverseDictionary[index] + " "; // Добавляем слово в строку
+                }
+                else {
+                    cerr << "Индекс " << index << " не найден в словаре." << endl;
+                }
+            }
+            catch (const invalid_argument& e) {
+                cerr << "Ошибка преобразования: " << e.what() << " для строки " << line << endl;
+            }
+        }
+    }
+
+    inFile.close();
+
+    // Теперь выводим слова в одну строку
+    cout << "Результат деархивации: " << outputWords << endl;
+
+    // Можно записать результаты в выходной файл, если это нужно
+    ofstream outFile(outputFile);
+    if (!outFile) {
+        cerr << "Не удалось открыть файл " << outputFile << " для записи." << endl;
+        return;
+    }
+
+    outFile << outputWords; // Записываем в выходной файл, если требуется
+    outFile.close();
+}
+
+int main() {
+    setlocale(LC_ALL, "ru");
+    string filename;
+    char answer;
+
+    cout << "Введите имя файла: ";
+    cin >> filename;
+
+    cout << "Выберите действие: \n1 - Архивация\n2 - Дехврахивация\nВведите 1 или 2: ";
+    cin >> answer;
+
+    switch (answer) {
+    case '1':
+        archive(filename + ".txt", filename + ".archive.txt");
+        cout << "Файл успешно заархивирован." << endl;
+        break;
+    case '2':
+        dearchive(filename + ".archive.txt", filename + ".txt");
+        cout << "Файл успешно деархивирован." << endl;
+        break;
+    default:
+        cout << "Неверный выбор. Пожалуйста, введите 1 или 2." << endl;
+        break;
+    }
+
+    return 0;
+}
