@@ -1,0 +1,92 @@
+#include <iostream>
+#include <cmath>
+#include <iomanip>
+#include <limits> 
+
+using namespace std;
+
+// Функция для вычисления расстояния между двумя точками
+double distance(double x1, double y1, double x2, double y2) {
+    return sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+}
+
+// Функция для проверки на существование треугольника
+bool isDegenerate(double a, double b, double c) {
+    return (a + b <= c || a + c <= b || b + c <= a);
+}
+
+int main() {
+    bool flag = true;
+    while (flag) {
+        // Входные данные: координаты вершин треугольника
+        double Ax, Ay, Bx, By, Cx, Cy;
+
+        cout << "Введите координаты вершины A (Ax, Ay): ";
+        while (!(cin >> Ax >> Ay)) {
+            cout << "Некорректный ввод. Пожалуйста, введите числа: ";
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
+
+        cout << "Введите координаты вершины B (Bx, By): ";
+        while (!(cin >> Bx >> By)) {
+            cout << "Некорректный ввод. Пожалуйста, введите числа: ";
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
+
+        cout << "Введите координаты вершины C (Cx, Cy): ";
+        while (!(cin >> Cx >> Cy)) {
+            cout << "Некорректный ввод. Пожалуйста, введите числа: ";
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
+
+        // Длины сторон треугольника
+        double a = distance(Bx, By, Cx, Cy); // BC
+        double b = distance(Cx, Cy, Ax, Ay); // CA
+        double c = distance(Ax, Ay, Bx, By); // AB
+
+        // Проверка, является ли треугольник вырожденным
+        if (isDegenerate(a, b, c)) {
+            cout << "Введённые координаты вершин не образуют треугольник." << endl;
+            continue; // Пропускаем текущую итерацию цикла
+        }
+
+        // Определяем D
+        double D = 2 * (Ax * (By - Cy) + Bx * (Cy - Ay) + Cx * (Ay - By));
+
+        // Избегаем деления на ноль
+        if (D == 0) {
+            cout << "Ошибка: деление на ноль. Могут быть ошибочные координаты." << endl;
+            continue;
+        }
+
+        // Находим координаты центра описанной окружности
+        double Ox = (a * a * Ax + b * b * Bx + c * c * Cx) / D;
+        double Oy = (a * a * Ay + b * b * By + c * c * Cy) / D;
+
+        // Площадь треугольника
+        double p = (a + b + c) / 2;
+        double S = sqrt(p * (p - a) * (p - b) * (p - c));
+
+        // Радиус описанной окружности
+        double R = (a * b * c) / (4 * S);
+
+        // Вывод результатов
+        cout << fixed << setprecision(6);
+        cout << "Координаты центра описанной окружности: (" << Ox << ", " << Oy << ")" << endl;
+        cout << "Радиус описанной окружности: " << R << endl;
+
+        // Запрос на повторный ввод
+        char choice;
+        cout << "Введите 'n' для выхода или 'y' для продолжения: ";
+        cin >> choice;
+
+        if (choice == 'n' || choice == 'N') {
+            flag = false;
+        }
+    }
+
+    return 0;
+}
