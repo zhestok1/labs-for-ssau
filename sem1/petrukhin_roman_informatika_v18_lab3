@@ -1,0 +1,89 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <limits>
+
+using namespace std;
+
+int main() {
+    setlocale(LC_ALL, "ru");
+
+    string answer;
+
+    do {
+        int n1;
+        cout << "Введите количество чисел в первой последовательности: ";
+        while (!(cin >> n1) || n1 <= 0) {
+            cout << "Некорректный ввод. Введите положительное целое число: ";
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
+
+        vector<int> sequence1(n1);
+        cout << "Введите числа первой последовательности: ";
+        for (int i = 0; i < n1; ++i) {
+            while (!(cin >> sequence1[i])) {
+                cout << "Некорректный ввод. Введите целое число: ";
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            }
+        }
+
+        int n2;
+        cout << "Введите количество чисел во второй последовательности: ";
+        while (!(cin >> n2) || n2 <= 0) {
+            cout << "Некорректный ввод. Введите положительное целое число: ";
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
+
+        vector<int> sequence2(n2);
+        cout << "Введите числа второй последовательности: ";
+        for (int i = 0; i < n2; ++i) {
+            while (!(cin >> sequence2[i])) {
+                cout << "Некорректный ввод. Введите целое число: ";
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            }
+        }
+
+        // Находим пересечение последовательностей без использования множеств
+        vector<int> commonNumbers;
+        for (int i = 0; i < n1; ++i) {
+            for (int j = 0; j < n2; ++j) {
+                if (sequence1[i] == sequence2[j]) {
+                    commonNumbers.push_back(sequence1[i]);
+                }
+            }
+        }
+
+        // Удаляем дубликаты из commonNumbers через цикл
+        vector<int> uniqueNumbers;
+        for (int i = 0; i < commonNumbers.size(); ++i) {
+            bool isDuplicate = false;
+            for (int j = 0; j < uniqueNumbers.size(); ++j) {
+                if (commonNumbers[i] == uniqueNumbers[j]) {
+                    isDuplicate = true;
+                    break;
+                }
+            }
+
+            if (isDuplicate == false) {
+                uniqueNumbers.push_back(commonNumbers[i]);
+            }
+        }
+
+        // Выводим результат в консоль
+        cout << "Общие числа в обеих последовательностях: ";
+        for (const int& num : uniqueNumbers) {
+            cout << num << " ";
+        }
+        cout << endl;
+
+        cout << "Хотите продолжить? (y/n): ";
+        cin >> answer;
+
+    } while (answer == "Y" || answer == "y");
+
+    return 0;
+}
