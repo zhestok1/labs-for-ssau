@@ -1,0 +1,109 @@
+#include <iostream>
+#include <cmath>
+#include <limits>
+#include <stdexcept> // Для исключений
+using namespace std;
+
+// Считаю факториальчик
+unsigned long long factorial(int n) {
+    if (n < 0) {
+        throw invalid_argument("The factorial is not defined for negative numbers.");
+    }
+    unsigned long long result = 1;
+    for (int i = 2; i <= n; ++i) {
+        // Проверка на переполнение перед умножением
+        if (result > numeric_limits<unsigned long long>::max() / i) {
+            throw overflow_error("Factorial computation resulted in overflow.");
+        }
+        result *= i;
+    }
+    return result;
+}
+
+int main() {
+    while (true) { 
+        double x, a; // x - параметр; a - точность вычислений
+        cout << "Enter the parameter x: ";
+
+        // Получаю икс от пользователя, проверяю
+        bool validInputX = false;
+        while (!validInputX) {
+            cin >> x;
+            if (cin.fail() || x < 0) {
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                cout << "Invalid input. Please enter a positive number for x: ";
+            }
+            else {
+                validInputX = true;
+            }
+        }
+
+        cout << "Enter the parameter a (accuracy): ";
+
+        // Получаю точность a, проверяю
+        bool validInputA = false;
+        while (!validInputA) {
+            cin >> a;
+            if (cin.fail() || a < 0) {
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                cout << "Invalid input. Please enter a non-negative number for a: ";
+            }
+            else {
+                validInputA = true;
+            }
+        }
+
+        double a_n = 0.0, s_n = 0.0; // n-ый член, сумма членов ряда
+        const int MAX_N = 20; // Предел для n
+        int n = 1; // Инициализация n
+        bool isAccuracyAchieved = false; // Флаг для достижения точности
+
+        while (n <= MAX_N && !isAccuracyAchieved) {
+            unsigned long long fact;
+
+            // Попытка вычислить факториал и обработка исключений
+            try {
+                fact = factorial(2 * n + 1);
+            }
+            catch (const overflow_error&) {
+                cout << "Factorial computation for n = " << n << " resulted in overflow." << endl;
+                isAccuracyAchieved = true; // Устанавливаем флаг, чтобы прекратить вычисления
+            }
+            catch (const invalid_argument&) {
+                cout << "Invalid argument for factorial." << endl;
+                isAccuracyAchieved = true; // Устанавливаем флаг, чтобы прекратить вычисления
+            }
+
+            if (!isAccuracyAchieved) {
+                // n-ый член и соответствующая сумма
+                a_n = (pow(-1, n) * 2 * n * pow(x, 2 * n + 1)) / fact;
+                s_n += a_n;
+
+                cout << "Sequence member a_" << n << ": " << a_n << ", Sum: " << s_n << endl;
+
+                // Проверка условия на точность
+                if (fabs(a_n) <= a) {
+                    isAccuracyAchieved = true; // Устанавливаем флаг, когда достигли нужной точности
+                }
+
+                n++;
+            }
+        }
+
+        cout << "Final sum of the series: " << s_n << endl;
+
+        // Запрос на продолжение
+        char choice;
+        cout << "Do you want to continue? (y/n): ";
+        cin >> choice;
+
+        // Проверка на продолжение
+        if (choice != 'y' && choice != 'Y') {
+            cout << "Exiting the program." << endl;
+            return 0; 
+        }
+    }
+
+    return 0;
