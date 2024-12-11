@@ -1,0 +1,89 @@
+#include <vector>
+#include <iostream>
+#include <algorithm>
+#include <limits>
+
+using namespace std;
+
+void heapify(vector<int>& arr, int n, int i) {
+    int largest = i;
+    int left = 2 * i + 1;
+    int right = 2 * i + 2;
+
+    // Проверяем, является ли левый дочерний элемент больше
+    if (left < n && arr[left] > arr[largest])
+        largest = left;
+
+    // Проверяем, является ли правый дочерний элемент больше
+    if (right < n && arr[right] > arr[largest])
+        largest = right;
+
+    // Если largest не равен начальному индексу
+    if (largest != i) {
+        swap(arr[i], arr[largest]);
+        heapify(arr, n, largest);
+    }
+}
+
+void heap_sort(vector<int>& arr) {
+    int n = arr.size();
+
+    // Строим пирамиду
+    for (int i = n / 2 - 1; i >= 0; i--)
+        heapify(arr, n, i);
+
+    // Одна за другой извлекаем элементы из пирамиды
+    for (int i = n - 1; i >= 0; i--) {
+        swap(arr[0], arr[i]);
+        heapify(arr, i, 0);
+    }
+}
+
+int main() {
+    setlocale(LC_ALL, "RU");
+    bool flag = true;
+
+    while (flag) {
+        int n;
+        cout << "Введите количество элементов (положительное целое число): ";
+
+        // Проверяем ввод количества элементов
+        while (!(cin >> n) || n <= 0) {
+            cin.clear(); // Сбрасываем состояние потока
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Игнорируем неправильный ввод
+            cout << "Ошибка! Пожалуйста, введите положительное целое число: ";
+        }
+
+        vector<int> elements(n);
+        for (int i = 0; i < n; i++) {
+            cout << "Введите элемент " << i + 1 << ": ";
+            while (!(cin >> elements[i])) {
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                cout << "Ошибка! Пожалуйста, введите целое число для элемента " << i + 1 << ": ";
+            }
+        }
+
+        heap_sort(elements);
+
+        cout << "Отсортированные элементы: ";
+        for ( auto elem : elements) {
+            cout << elem << " ";
+        }
+        cout << endl;
+
+        char choice;
+        cout << "Хотите выйти? Нажмите 'N' или 'n' для выхода из программы, любую другую клавишу для продолжения: ";
+        cin >> choice;
+
+        if (choice == 'N' || choice == 'n') {
+            flag = false;
+            cout << "Конец программы!" << endl;
+        }
+
+        // Очищаем ввод, чтобы предотвратить проблемы с последующими вводами
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    }
+
+    return 0;
+}
