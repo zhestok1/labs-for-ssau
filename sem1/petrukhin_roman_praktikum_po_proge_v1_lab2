@@ -1,0 +1,95 @@
+#include <iostream>
+#include <cmath>
+#include <iomanip>
+#include <vector>
+#include <limits>
+
+using namespace std;
+
+double factorial(int n) {
+    if (n == 0 || n == 1)
+        return 1;
+
+    double result = 1;
+    for (int i = 2; i <= n; ++i) {
+        result *= i;
+    }
+    return result;
+}
+
+int main() {
+    double An, x, alpha_n, accuracy;
+    double prev_x = 0, prev_alpha = 0, Sn = 0;
+    char answer;
+    int last_iteration = 0;
+
+    // Вектор для хранения значений An
+    vector<double> An_values;
+
+    do {
+        cout << "Enter x (any real number):\n";
+        bool validInputX = false; // Флаг для проверки ввода x
+        while (!validInputX) {
+            if (cin >> x) {
+                validInputX = true; // Ввод корректен
+            } else {
+                cout << "Invalid input. Please enter a valid real number for x:\n";
+                cin.clear(); // Очистка флага ошибки
+                cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Игнорирование неверного ввода
+            }
+        }
+
+        cout << "Enter the alpha (positive number):\n"; 
+        bool validInputAlpha = false; // Флаг для проверки ввода alpha
+        while (!validInputAlpha) {
+            cin >> alpha_n;
+            if (cin.fail() || alpha_n <= 0) { // Проверка на корректный ввод и положительное значение
+                cin.clear(); // Очистка флага ошибки
+                cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Игнорирование неверного ввода
+                cout << "The alpha must be a positive number. Try again:\n";
+            } else {
+                validInputAlpha = true; // Ввод корректен
+            }
+        }
+
+        if (x != prev_x || alpha_n != prev_alpha) {
+            Sn = 0;
+            last_iteration = 0;
+            An_values.clear(); // Очищаем вектор для новых вычислений
+        }
+
+        int i = last_iteration;
+
+        do {
+            cout << endl;
+
+            // Если значение An уже вычислено, берем его из вектора
+            if (i < An_values.size()) {
+                cout << "Iteration number (-n): " << i << endl;
+                An = An_values[i];
+            } else { // В противном случае вычисляем новое значение
+                cout << "Iteration number (+n): " << i << endl;
+                An = (pow(-1, i) * 2 * i * pow(x, 2 * i + 1)) / factorial(2 * i + 1);
+                An_values.push_back(An); // Сохраняем новое значение в вектор
+            }
+
+            Sn += An;
+            accuracy = abs((pow(-1, i + 1) * 2 * (i + 1) * pow(x, 2 * (i + 1) + 1)) / factorial(2 * (i + 1) + 1));
+
+            cout << "The last summed term of the series (An): " << setprecision(12) << An << endl;
+            cout << "Current partial sum (Sn): " << setprecision(12) << Sn << endl;
+            cout << "Calculation accuracy (alpha): " << accuracy << endl;
+
+            i += 1;
+        } while (abs(accuracy) >= alpha_n);
+
+        prev_x = x;
+        prev_alpha = alpha_n;
+        last_iteration = i; // обновляем значение последней итерации
+
+        cout << "Would you like to continue? If yes - enter Y, if no - any symbol:\n";
+        cin >> answer;
+    } while (answer == 'Y' || answer == 'y'); // Поддержка 'y' в нижнем регистре
+
+    return 0;
+}
