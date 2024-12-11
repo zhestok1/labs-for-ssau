@@ -1,0 +1,60 @@
+#include <iostream>
+#include <vector>
+#include <limits>
+
+using namespace std;
+
+// Функция для нахождения НОД двух чисел
+int nod(int a, int b) {
+    while (b != 0) {
+        int buf = b;
+        b = a % b;
+        a = buf;
+    }
+    return a;
+}
+
+// Функция для нахождения НОД для массива чисел
+int massNOD(const vector<int>& numbers) {
+    int result = numbers[0];
+    for (int i = 1; i < numbers.size(); ++i) {
+        result = nod(result, numbers[i]);
+        if (result == 1) {
+            return 1; // НОД не может быть меньше 1
+        }
+    }
+    return result;
+}
+
+int main() {
+    setlocale(LC_ALL, "ru");
+    vector<int> numbers;
+    int n, num;
+
+    cout << "Введите количество чисел: ";
+    while (!(cin >> n) || n <= 0) {
+        cout << "Пожалуйста, введите положительное целое число: ";
+        cin.clear(); // Очищаем состояние потока
+        cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Игнорируем некорректный ввод
+    }
+
+    cout << "Введите числа: ";
+    for (int i = 0; i < n; ++i) {
+        while (!(cin >> num)) {
+            cout << "Пожалуйста, введите целое число: ";
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
+        numbers.push_back(num);
+    }
+
+    if (numbers.empty()) {
+        cout << "Нет чисел для вычисления НОД." << endl;
+        return 0;
+    }
+
+    int result = massNOD(numbers);
+    cout << "Наибольший общий делитель: " << result << endl;
+
+    return 0;
+}
